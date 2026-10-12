@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Find the cheapest, easiest way to get a U.S. passport. Answer five questions and see exact fees, the right form, and the steps.">
+<meta property="og:title" content="Cheapest Passport Finder">
+<meta property="og:description" content="Exact U.S. passport fees and the lowest-cost route for your situation.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='6' y='3' width='20' height='26' rx='3' fill='%2313263D'/%3E%3Ccircle cx='16' cy='14' r='5' fill='none' stroke='%23EDF1F3' stroke-width='1.6'/%3E%3Crect x='11' y='23' width='10' height='1.6' fill='%23EDF1F3'/%3E%3C/svg%3E">
+<title>Cheapest Passport Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+html{{color-scheme:light}}
+body{{margin:0}}
+img{{max-width:100%}}
+[hidden]{{display:none!important}}
+/* Layout: a single passport-page column — questions on the left "visa page", result stamped on the right; stacks on phones */
+:root{
+  --paper:#EDF1F3; --page:#F8FAFB; --ink:#13263D; --muted:#5A6878; --line:#CDD6DE;
+  --stamp:#A8324A; --teal:#1F6F6B; --chip:#E3E9EE; --good:#1F6F4A;
+  --display:"Libre Caslon Display",Georgia,serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E151D; --page:#152029; --ink:#E4EBF1; --muted:#97A6B4; --line:#2A3946;
+  --stamp:#E27389; --teal:#5DBDB5; --chip:#1D2B37; --good:#6FCB9A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E151D; --page:#152029; --ink:#E4EBF1; --muted:#97A6B4; --line:#2A3946;
+  --stamp:#E27389; --teal:#5DBDB5; --chip:#1D2B37; --good:#6FCB9A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:28px 40px;display:flex;flex-direction:column;gap:22px}
+header h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,5vw,46px);line-height:1.05;margin:0;text-wrap:balance}
+header p{margin:8px 0 0;color:var(--muted);max-width:62ch}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--page);border:1px solid var(--line);border-radius:6px;padding:22px;display:flex;flex-direction:column;gap:20px;min-width:0}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+legend{font-weight:600;margin-bottom:8px;padding:0}
+.q-num{font-family:var(--mono);color:var(--muted);font-weight:400;margin-right:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{cursor:pointer}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips span{display:inline-block;padding:7px 12px;border-radius:999px;background:var(--chip);border:1px solid transparent;font-size:14px;transition:background .15s,border-color .15s}
+.chips input:checked+span{background:var(--ink);color:var(--page)}
+.chips input:focus-visible+span{outline:2px solid var(--teal);outline-offset:2px}
+.checks label{display:flex;gap:10px;align-items:flex-start;font-size:14px;cursor:pointer}
+.checks input{margin-top:3px;accent-color:var(--teal)}
+.hint{font-size:13px;color:var(--muted);margin:0}
+/* result */
+.result{position:relative;overflow:hidden}
+.route-name{font-family:var(--display);font-size:clamp(24px,3.4vw,32px);line-height:1.1;margin:4px 0 0;text-wrap:balance}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:3px;border:1px solid var(--line);color:var(--muted)}
+.badge.form{border-color:var(--teal);color:var(--teal)}
+.stamp{align-self:flex-start;border:3px double var(--stamp);color:var(--stamp);border-radius:8px;padding:10px 18px;transform:rotate(-3deg);font-family:var(--mono);text-align:center}
+.stamp .amt{font-size:38px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.stamp .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td{padding:7px 0;border-bottom:1px dashed var(--line);vertical-align:top}
+td.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:12px}
+tr.est td{color:var(--muted)}
+h3{font-size:12px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:600}
+ol,ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.save li::marker{color:var(--good)}
+.save li{font-size:14px}
+.warn{font-size:13px;border-left:3px solid var(--stamp);padding:8px 12px;background:var(--chip);border-radius:0 4px 4px 0}
+a{color:var(--teal)}
+.mrz{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--muted);overflow-x:auto;white-space:nowrap;border-top:1px solid var(--line);padding-top:12px}
+footer{font-size:12px;color:var(--muted);max-width:75ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">U.S. passport · fees as of Oct 2026</div>
+    <h1>Cheapest Passport Finder</h1>
+    <p>Answer five questions. It picks the lowest-cost, least-hassle way to get a U.S. passport for your situation and shows exactly what you'll pay.</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="qs" autocomplete="off">
+      <fieldset>
+        <legend><span class="q-num">01</span>Who's the passport for?</legend>
+        <div class="chips">
+          <label><input type="radio" name="who" id="who-adult" value="adult" checked><span>Me / someone 16+</span></label>
+          <label><input type="radio" name="who" id="who-minor" value="minor"><span>A child under 16</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset id="f-before">
+        <legend><span class="q-num">02</span>Ever had a U.S. passport (book or card)?</legend>
+        <div class="chips">
+          <label><input type="radio" name="before" id="before-no" value="no" checked><span>No, first time</span></label>
+          <label><input type="radio" name="before" id="before-yes" value="yes"><span>Yes</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset id="f-checks" class="checks" hidden>
+        <legend><span class="q-num">02b</span>About your most recent passport — check all that are true</legend>
+        <label><input type="checkbox" id="c-have"> I have it, and it isn't damaged, lost, or stolen</label>
+        <label><input type="checkbox" id="c-16"> It was issued when I was 16 or older</label>
+        <label><input type="checkbox" id="c-15"> It was issued less than 15 years ago</label>
+        <label><input type="checkbox" id="c-name"> My name is the same (or I have the marriage cert / court order)</label>
+        <label><input type="checkbox" id="c-us"> I live in the U.S. right now</label>
+        <p class="hint">All of the first four = you can renew and skip the $35 in-person fee.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="q-num">03</span>What do you need it for?</legend>
+        <div class="chips">
+          <label><input type="radio" name="use" id="use-air" value="air" checked><span>Flying abroad</span></label>
+          <label><input type="radio" name="use" id="use-land" value="land"><span>Driving / cruising to Canada, Mexico, Caribbean, Bermuda</span></label>
+          <label><input type="radio" name="use" id="use-both" value="both"><span>Both</span></label>
+          <label><input type="radio" name="use" id="use-id" value="id"><span>Just want a federal photo ID</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="q-num">04</span>When do you travel?</legend>
+        <div class="chips">
+          <label><input type="radio" name="when" id="when-none" value="none" checked><span>Not booked / 2+ months out</span></label>
+          <label><input type="radio" name="when" id="when-soon" value="soon"><span>2–8 weeks</span></label>
+          <label><input type="radio" name="when" id="when-urgent" value="urgent"><span>Within 14 days</span></label>
+        </div>
+      </fieldset>
+      <p class="hint">Starts with an example (first-time adult, flying abroad). Change any answer and the result updates.</p>
+    </form>
+
+    <section class="panel result" aria-live="polite">
+      <div>
+        <div class="eyebrow">Your cheapest route</div>
+        <h2 class="route-name" id="r-name"></h2>
+      </div>
+      <div class="badges" id="r-badges"></div>
+      <div class="stamp"><div class="amt" id="r-total"></div><div class="lbl">government fees</div></div>
+      <div>
+        <h3>Breakdown</h3>
+        <table id="r-table"></table>
+      </div>
+      <div>
+        <h3>Steps</h3>
+        <ol id="r-steps"></ol>
+      </div>
+      <div>
+        <h3>Ways to pay less</h3>
+        <ul class="save" id="r-save"></ul>
+      </div>
+      <div class="warn" id="r-warn"></div>
+      <div class="mrz" aria-hidden="true">P&lt;USA&lt;&lt;CHEAPEST&lt;&lt;ROUTE&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+    </section>
+  </div>
+
+  <footer>
+    Fees from the State Department's October 2026 fee chart: book $130, card $30, both $160 (under 16: $100 / $15 / $115), plus a $35 acceptance fee only when you apply in person on form DS-11. Renewals by mail or online skip the $35. Expedite is $60. Photo and postage lines are estimates. Fees change, so confirm at <a href="https://travel.state.gov/content/travel/en/passports/how-apply/fees.html" target="_blank" rel="noopener">travel.state.gov</a> before paying. This tool is a guide, not legal advice.
+  </footer>
+</div>
+
+<script>
+const F={adult:{book:130,card:30,both:160},minor:{book:100,card:15,both:115}};
+const EXEC=35, EXPEDITE=60;
+const $=id=>document.getElementById(id);
+const val=n=>document.querySelector(`input[name="${n}"]:checked`).value;
+const money=n=>'$'+n;
+
+function render(){
+  const who=val('who'), before=val('before'), use=val('use'), when=val('when');
+  const minor=who==='minor';
+  $('f-before').hidden=minor;
+  $('f-checks').hidden=minor||before!=='yes';
+  const c=k=>$('c-'+k).checked;
+  const renew=!minor&&before==='yes'&&c('have')&&c('16')&&c('15')&&c('name');
+  const inUS=c('us');
+  const doc= use==='air'?'book': use==='both'?'both':'card';
+  const docName={book:'passport book',card:'passport card',both:'passport book + card'}[doc];
+  const app=F[who][doc];
+
+  let route, form, rows=[[`Application fee (${docName}${minor?', under 16':''})`,app]], est=[], steps=[], save=[], warn='';
+  let total=app;
+
+  if(when==='urgent'){
+    form=renew?'DS-82':'DS-11';
+    route='Urgent appointment at a passport agency';
+    if(!renew){rows.push(['Acceptance fee (in person)',EXEC]);total+=EXEC;}
+    rows.push(['Expedite fee (required here)',EXPEDITE]);total+=EXPEDITE;
+    est.push(['Passport photo (DIY print)','≈$1']);
+    steps=[
+      'Have proof of international travel within 14 days (ticket or itinerary).',
+      'Book an appointment through the State Department\'s online scheduler or by calling 1-877-487-2778. The closest agency to southern NH is in Portsmouth (National Passport Center) or Boston.',
+      `Fill out ${form} online with the form filler and print it.`,
+      renew?'Bring your old passport, a photo, and payment.':'Bring a certified birth certificate (or other citizenship proof), photo ID plus a photocopy of it, a photo, and payment.',
+      'Many agencies hand the passport back the same day or within a few days.'
+    ];
+    save.push('If your trip can move past 2 months, you skip the $60 expedite and the agency trip entirely.');
+    warn='Never pay a private "expediter" for this. The agency appointment is free to book.';
+  } else if(renew && inUS && when==='none'){
+    form='Online renewal';
+    route='Renew online — the easiest and cheapest option';
+    est.push(['Digital photo (take it yourself)','$0'],['Postage','$0']);
+    steps=[
+      'Go to the official online renewal portal (travel.state.gov → Renew Your Passport Online) and sign in with Login.gov.',
+      'Take a digital photo against a plain white wall: no glasses, no selfie arm, neutral face. A friend with a phone works.',
+      `Request the same type you have now. Online renewal can't switch a card to a book or add a second document; if you need that, mail a DS-82 instead (same fee).`,
+      'Pay by debit/credit card. Your old passport is canceled as soon as you submit, so don\'t plan to use it.',
+      'Track status online; the new one arrives by mail.'
+    ];
+    save.push('No photo shop, no postage, no $35 acceptance fee. This is the floor.');
+    warn='The only real site ends in .gov. Lookalike ".com" renewal sites charge extra and some are scams.';
+  } else if(renew){
+    form='DS-82';
+    route='Renew by mail with form DS-82';
+    if(when==='soon'){rows.push(['Expedite fee',EXPEDITE]);total+=EXPEDITE;}
+    est.push(['Passport photo (DIY print)','≈$1'],['Tracked postage','≈$5–10']);
+    steps=[
+      'Fill out DS-82 with the official online form filler and print it single-sided.',
+      'Get a 2×2 photo (see tips below for the cheap way).',
+      'Write a check or money order to "U.S. Department of State".',
+      'Mail the form, old passport, photo, and check in a padded envelope with tracking.',
+      when==='soon'?'Write "EXPEDITE" on the envelope and the address the form gives for expedited service.':'Track status online; your old passport comes back separately.'
+    ];
+    save.push('No $35 acceptance fee, because renewals by mail skip it.');
+    if(!inUS) save.push('Online renewal needs a U.S. address. Mail is the route for you.');
+    if(when==='soon') save.push('If you can wait 2+ months, drop the $60 expedite and renew online for even less hassle.');
+    warn='Use a check, not cash. An unsigned check or a wrong amount gets the whole application suspended.';
+  } else {
+    form='DS-11';
+    route=minor?'Apply in person for your child (DS-11)':'Apply in person with form DS-11';
+    rows.push(['Acceptance fee (paid to post office / town office)',EXEC]);total+=EXEC;
+    if(when==='soon'){rows.push(['Expedite fee',EXPEDITE]);total+=EXPEDITE;}
+    est.push(['Passport photo (DIY print)','≈$1'],['Birth certificate copy, if you need one','varies']);
+    steps=[
+      'Fill out DS-11 with the official online form filler and print it. Don\'t sign it yet; you sign in front of the agent.',
+      'Gather a certified birth certificate (or old passport / naturalization cert) plus a photocopy of it.',
+      'Bring a valid photo ID (driver\'s license) plus a photocopy of the front and back.',
+      minor?'Both parents/guardians should come with the child. If one can\'t, bring their notarized consent form DS-3053 and a copy of their ID.':'Bring a 2×2 photo.',
+      'Book a slot at a passport acceptance facility (many post offices and town/city clerk offices). Find one at iafdb.travel.state.gov.',
+      'Pay two separate payments: a check for the application fee to "U.S. Department of State", and the $35 acceptance fee to the facility.'
+    ];
+    if(!minor&&before==='yes') save.push('Your old passport doesn\'t qualify for renewal, so DS-11 is required. If you just didn\'t check a box above by mistake, recheck it: renewing saves $35.');
+    if(when==='soon') save.push('Applying 2+ months ahead skips the $60 expedite.');
+    warn=minor?'Under-16 passports are only valid for 5 years, so don\'t buy the book unless the child will actually fly abroad.':'The $35 acceptance fee is the same at every facility, so pick the one with the easiest appointment.';
+  }
+
+  // universal savings
+  if(when!=='urgent' && form!=='Online renewal') save.push('Skip the $15–17 photo counter: take the photo against a white wall, lay two 2×2s onto a 4×6 with a free passport-photo template, and print it at a drugstore kiosk for well under $1.');
+  if(doc==='both') save.push('Only get the card too if you\'ll actually drive or cruise across a border. Book alone saves $30.');
+  if(doc==='card'&&use!=='id') save.push(`The card can't be used to fly internationally. It's the right pick if you only cross by land or sea, and it's $${F[who].book-F[who].card} cheaper than the book.`);
+  if(use==='id') save.push('A passport card is the cheapest federal photo ID ($30) and works at TSA for domestic flights. If your driver\'s license is already REAL ID-compliant, you may not need anything.');
+  if(use==='air') save.push('Leave 1–3 day return delivery unchecked unless you\'re in a rush; regular mail is free.');
+
+  $('r-name').textContent=route;
+  $('r-badges').innerHTML=`<span class="badge form">${form}</span><span class="badge">${docName}</span>`+(renew&&when!=='urgent'?'<span class="badge">no $35 fee</span>':'');
+  $('r-total').textContent=money(total);
+  $('r-table').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${money(r[1])}</td></tr>`).join('')
+    +`<tr><td><strong>Total to the government</strong></td><td class="n"><strong>${money(total)}</strong></td></tr>`
+    +est.map(r=>`<tr class="est"><td>${r[0]} <em>(estimate)</em></td><td class="n">${r[1]}</td></tr>`).join('');
+  $('r-steps').innerHTML=steps.map(s=>`<li>${s}</li>`).join('');
+  $('r-save').innerHTML=save.map(s=>`<li>${s}</li>`).join('');
+  $('r-warn').textContent=warn;
+}
+$('qs').addEventListener('change',render);
+$('qs').addEventListener('submit',e=>e.preventDefault());
+render();
+</script>
+</body>
+</html>
